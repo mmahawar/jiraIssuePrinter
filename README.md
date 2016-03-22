@@ -22,10 +22,10 @@ How to run the program for Printing Issues for a Sprint
 * Install maven commandline version
 * Install jre 1.8
 * Update the arguments in pom.xml with correct credentials
-** <argument>-sTRUE</argument>
-** <argument>-iPRTR-57</argument>
-** <argument>-uMa3l3K8</argument>
-** <argument>-pxxxx</argument>
+  * <argument>-sTRUE</argument>
+  * <argument>-iPRTR-57</argument>
+  * <argument>-uMa3l3K8</argument>
+  * <argument>-pxxxx</argument>
 * Run  mvn clean compile
 * Run mvn exec:java
 
