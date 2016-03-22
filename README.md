@@ -4,8 +4,8 @@ Introduction
 ============
 This application can print a single Jira Issue or can print all the issues in a given sprint.
 
-Parameters
-==========
+Parameters to pass
+==================
 This application takes four parameters
 * -s : Indicator to specify single issue vs. printing entire sprint issues. 
 ** TRUE indicates Print sprint issue
@@ -16,10 +16,17 @@ This application takes four parameters
 * -u : GAP Jira username i.e. Ma3l3k8 
 * -p : GAP Jira password xxxxxx 
 
-
 How to run the program for Printing Issues for a Sprint
 =======================================================
-* Download the program 
-* Run PrintIssue class with above four parameters   "-s false -u Ma3l3k8 -p xxxx -i 9809" 
+* Clone the git repo locally
+* Install maven commandline version
+* Install jre 1.8
+* Update the arguments in pom.xml with correct credentials
+** <argument>-sTRUE</argument>
+** <argument>-iPRTR-57</argument>
+** <argument>-uMa3l3K8</argument>
+** <argument>-pxxxx</argument>
+* Run  mvn clean compile
+* Run mvn exec:java
 
 
