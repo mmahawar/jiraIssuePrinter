@@ -19,11 +19,9 @@ import com.itextpdf.text.pdf.PdfWriter;
 public class PDFBuilder {
 
 	public static void createPDF(String pdfFilename, Collection<Issue> issues) {
-
 		Document doc = new Document();
 		PdfWriter docWriter = null;
 		try {
-
 			// file path
 			String path = pdfFilename;
 			docWriter = PdfWriter.getInstance(doc, new FileOutputStream(path));
@@ -69,25 +67,27 @@ public class PDFBuilder {
 		// set table width a percentage of the page width
 		table.setWidthPercentage(60f);
 		// insert column headings
-		insertCell(table, "Story No:" + issue.getKey(), Element.ALIGN_LEFT, 1, headingFont);
-		insertCell(table, "Story Points:" + issue.getStoryPoints(), Element.ALIGN_RIGHT, 1, headingFont);
+		insertCell(table, "Story No:" + issue.getKey(), Element.ALIGN_LEFT, 1, headingFont, false);
+		insertCell(table, "Story Points:" + issue.getStoryPoints(), Element.ALIGN_RIGHT, 1, headingFont, false);
 		table.setHeaderRows(1);
-        table.setKeepTogether(true);
-        table.setSplitRows(false);
-        
-		insertCell(table, "Summary", Element.ALIGN_LEFT, 2, headingFont);
-		insertCell(table, issue.getSummary(), Element.ALIGN_LEFT, 2, contentFont);
-		
-		insertCell(table, "Acceptance Criteria", Element.ALIGN_LEFT, 2, headingFont);
-		String acs = issue.getAcs(); 
-		insertCell(table, acs == null? " " : acs, Element.ALIGN_LEFT, 2, contentFont);
-		
-		insertCell(table, "----------------------------- cut here ----------------------------- ", Element.ALIGN_CENTER, 2, contentFont);
+		table.setKeepTogether(true);
+		table.setSplitRows(false);
+
+		insertCell(table, "Summary", Element.ALIGN_LEFT, 2, headingFont, false);
+		insertCell(table, issue.getSummary(), Element.ALIGN_LEFT, 2, contentFont, true);
+
+		insertCell(table, "Acceptance Criteria", Element.ALIGN_LEFT, 2, headingFont, false);
+		String acs = issue.getAcs();
+		insertCell(table, acs == null ? " " : acs, Element.ALIGN_LEFT, 2, contentFont, true);
+
+		insertCell(table, "----------------------------- cut here ----------------------------- ", Element.ALIGN_CENTER,
+				2, contentFont, false);
 		paragraph.add(table);
 		return paragraph;
 	};
 
-	private static void insertCell(PdfPTable table, String text, int align, int colspan, Font font) {
+	private static void insertCell(PdfPTable table, String text, int align, int colspan, Font font,
+			boolean isMiddleRow) {
 		// create a new cell with the specified Text and Font
 		PdfPCell cell = new PdfPCell(new Phrase(text.trim(), font));
 		// set the cell alignment
@@ -98,9 +98,10 @@ public class PDFBuilder {
 		if (text.trim().equalsIgnoreCase("")) {
 			cell.setMinimumHeight(10f);
 		}
+		if (isMiddleRow)
+			cell.setFixedHeight(55f);
 		// add the call to the table
 		table.addCell(cell);
 
 	}
-
 }

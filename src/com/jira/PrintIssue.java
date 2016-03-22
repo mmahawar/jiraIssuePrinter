@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,9 +60,7 @@ public class PrintIssue {
 			issues.add(issue);
 			// //Print the PDF
 			PDFBuilder.createPDF("sprintIssues.pdf", issues);
-
 		}
-
 	}
 
 	public static String read(InputStream input) throws IOException {
@@ -71,8 +68,6 @@ public class PrintIssue {
 			return buffer.lines().collect(Collectors.joining("\n"));
 		}
 	}
-
-	private static Function<JSONObject, String> key_issue = i -> (String) i.get("key");
 
 	private static Function<JSONObject, Issue> value_returnIssue = json -> {
 		Issue issue = new Issue();
