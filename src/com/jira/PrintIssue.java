@@ -48,18 +48,22 @@ public class PrintIssue {
 		InputStream is = p.getInputStream();
 		JSONParser parser = new JSONParser();
 		JSONObject jsonObj = (JSONObject) parser.parse(read(is));
+
 		JSONArray jsonArray = (JSONArray) jsonObj.get("issues");
+		if (jsonArray != null) {
+			@SuppressWarnings("unchecked")
+			List<Issue> issues = (List<Issue>) jsonArray.stream().map(value_returnIssue).collect(Collectors.toList());
+			// //Print the PDF
+			PDFBuilder.createPDF("sprintIssues.pdf", issues);
+		} else {
+			List<Issue> issues = new ArrayList<>();
+			Issue issue = value_returnIssue.apply(jsonObj);
+			issues.add(issue);
+			// //Print the PDF
+			PDFBuilder.createPDF("sprintIssues.pdf", issues);
 
-		@SuppressWarnings("unchecked")
-		Map<String, Issue> issues = (Map<String, Issue>) jsonArray.stream()
-				.collect(Collectors.toMap(key_issue, value_returnIssue));
+		}
 
-//		issues.forEach((key, issue) -> {
-//			System.out.println(key + "::" + issue.getIssueType() + " ::: " + issue.getAcs() + " " + issue.getSummary());
-//		});
-		
-		// //Print the PDF
-		PDFBuilder.createPDF("sprintIssues.pdf", issues.values());
 	}
 
 	public static String read(InputStream input) throws IOException {
