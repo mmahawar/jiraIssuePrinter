@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -44,18 +46,26 @@ public class PrintIssue {
 		final CommandLineParser parser = new DefaultParser();
 
 		final Options options = new Options();
-		options.addOption("s", CommandLineOptions.sprintIssues.toString(), true, "Print Sprint Issues");
-		options.addOption("i", CommandLineOptions.id.toString(), true, "Jira Issue Id or Sprint Id");
-		options.addOption("u", CommandLineOptions.username.toString(), true, "Jira User Name");
-		options.addOption("p", CommandLineOptions.password.toString(), true, "Jira Password");
+		options.addOption("s", true, "Print Sprint Issues TRUE/FALSE");
+		options.addOption("i", true, "Jira Issue Id or Sprint Id");
+		options.addOption("u", true, "Jira User Name");
+		options.addOption("p", true, "Jira Password");
 
-		final CommandLine commandLine = parser.parse(options, args);
+		OptionGroup optionGroup = new OptionGroup();
+		optionGroup.setRequired(true);
+		
+		
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp( "help", options );
 
+		final CommandLine commandLine = parser.parse(options, args, true);
+		
 		Map<String, String> arguments = new HashMap<String, String>();
 		arguments.put(CommandLineOptions.sprintIssues.toString(), getOption('s', commandLine));
 		arguments.put(CommandLineOptions.id.toString(), getOption('i', commandLine));
 		arguments.put(CommandLineOptions.username.toString(), getOption('u', commandLine));
 		arguments.put(CommandLineOptions.password.toString(), getOption('p', commandLine));
+		
 		return arguments;
 	}
 
