@@ -4,7 +4,8 @@ public enum CLOptions {
 	sprintIssues("Print Sprint Issues TRUE/FALSE", 's'), 
 	id("Jira Issue Id or Sprint Id",'i'), 
 	username("Jira User Name", 'u'), 
-	password("Jira Password", 'p');
+	password("Jira Password", 'p'),
+	jiraDomain("Jira Domain", 'd');
 
 	private final String text;
 	private final char option;

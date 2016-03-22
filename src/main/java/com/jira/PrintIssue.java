@@ -29,7 +29,7 @@ public class PrintIssue {
 	}
 
 	private static void printEntireSprintIssues(Map<String, String> clArgs) throws IOException, ParseException {
-		String jiraRestURLForSprintIssues = "https://jira.gapinc.com/rest/agile/1.0/sprint/"
+		String jiraRestURLForSprintIssues = "https://"+ clArgs.get(CLOptions.jiraDomain.getOptionAsString()) + "/rest/agile/1.0/sprint/"
 				+ clArgs.get(CLOptions.id.getOptionAsString()) + "/issue";
 		JSONObject jsonObj = findJiraIssues(clArgs.get(CLOptions.username.getOptionAsString()), clArgs.get(CLOptions.password.getOptionAsString()), jiraRestURLForSprintIssues);
 		JSONArray jsonArray = (JSONArray) jsonObj.get("issues");
@@ -40,7 +40,7 @@ public class PrintIssue {
 	}
 
 	private static void printSingleIssue(Map<String, String> clArgs) throws IOException, ParseException {
-		String jiraRestURLForSingleIssue = "https://jira.gapinc.com/rest/agile/1.0/issue/"
+		String jiraRestURLForSingleIssue = "https://"+ clArgs.get(CLOptions.jiraDomain.getOptionAsString()) + "/rest/agile/1.0/issue/"
 				+ clArgs.get(CLOptions.id.getOptionAsString());
 		
 		JSONObject jsonObj = findJiraIssues(clArgs.get(CLOptions.username.getOptionAsString()), clArgs.get(CLOptions.password.getOptionAsString()), jiraRestURLForSingleIssue);

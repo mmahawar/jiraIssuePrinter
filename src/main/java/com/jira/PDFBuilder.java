@@ -1,5 +1,6 @@
 package com.jira;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.Collection;
 
@@ -31,17 +32,12 @@ public class PDFBuilder {
 			doc.addCreationDate();
 			doc.addTitle("Sprint Issues for Printing");
 			doc.setPageSize(PageSize.LETTER);
-
 			doc.open();
-
 			for (Issue issue : issues) {
 				doc.add(anIssueTable(issue));
 			}
-
-		} catch (DocumentException dex) {
+		} catch (DocumentException | FileNotFoundException dex) {
 			dex.printStackTrace();
-		} catch (Exception ex) {
-			ex.printStackTrace();
 		} finally {
 			if (doc != null) {
 				// close the document

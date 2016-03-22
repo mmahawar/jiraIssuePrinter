@@ -64,10 +64,11 @@
 				<configuration>
 					<mainClass>com.jira.PrintIssue</mainClass>
 					<arguments>
-						<argument>-sTRUE</argument>
-						<argument>-iPRTR-57</argument>
+						<argument>-sFALSE</argument>
+						<argument>-i9809</argument>
 						<argument>-uMa3l3K8</argument>
 						<argument>-pxxxx</argument>
+						<argument>-dxxxx</argument>
 					</arguments>
 				</configuration>
 			</plugin>
