@@ -5,11 +5,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -17,50 +22,82 @@ import org.json.simple.parser.ParseException;
 
 public class PrintIssue {
 
-	public static void main(String[] args) throws IOException, ParseException {
-
-		List<String> commandLineArgs = new ArrayList<String>();
-		commandLineArgs.addAll(Arrays.asList(args));
-		boolean isSingleIssue = Boolean.valueOf(commandLineArgs.get(0));
-
-		String userName = commandLineArgs.get(1);
-		String password = commandLineArgs.get(2);
-
+	public static void main(String[] args) throws IOException, ParseException, org.apache.commons.cli.ParseException {
+		Map<String, String> commandLineArguments = verifyCommandLineArguments(args);
+		// TODO: print usage
+		boolean isSingleIssue = Boolean.valueOf(commandLineArguments.get(CommandLineOptions.sprintIssues.toString()));
 		if (isSingleIssue) {
-			String jiraRestURLForSingleIssue = "https://jira.gapinc.com/rest/agile/1.0/issue/" + commandLineArgs.get(3);
-			printIssues(userName, password, jiraRestURLForSingleIssue);
+			String jiraRestURLForSingleIssue = "https://jira.gapinc.com/rest/agile/1.0/issue/"
+					+ commandLineArguments.get(CommandLineOptions.id.toString());
+			printIssues(commandLineArguments.get(CommandLineOptions.username.toString()),
+					commandLineArguments.get(CommandLineOptions.password.toString()), jiraRestURLForSingleIssue);
 		} else {
 			String jiraRestURLForSprintIssues = "https://jira.gapinc.com/rest/agile/1.0/sprint/"
-					+ commandLineArgs.get(3) + "/issue";
-			printIssues(userName, password, jiraRestURLForSprintIssues);
+					+ commandLineArguments.get(CommandLineOptions.id.toString()) + "/issue";
+			printIssues(commandLineArguments.get(CommandLineOptions.username.toString()),
+					commandLineArguments.get(CommandLineOptions.password.toString()), jiraRestURLForSprintIssues);
 		}
+	}
+
+	private static Map<String, String> verifyCommandLineArguments(String[] args)
+			throws ParseException, org.apache.commons.cli.ParseException {
+		final CommandLineParser parser = new DefaultParser();
+
+		final Options options = new Options();
+		options.addOption("s", CommandLineOptions.sprintIssues.toString(), true, "Print Sprint Issues");
+		options.addOption("i", CommandLineOptions.id.toString(), true, "Jira Issue Id or Sprint Id");
+		options.addOption("u", CommandLineOptions.username.toString(), true, "Jira User Name");
+		options.addOption("p", CommandLineOptions.password.toString(), true, "Jira Password");
+
+		final CommandLine commandLine = parser.parse(options, args);
+
+		Map<String, String> arguments = new HashMap<String, String>();
+		arguments.put(CommandLineOptions.sprintIssues.toString(), getOption('s', commandLine));
+		arguments.put(CommandLineOptions.id.toString(), getOption('i', commandLine));
+		arguments.put(CommandLineOptions.username.toString(), getOption('u', commandLine));
+		arguments.put(CommandLineOptions.password.toString(), getOption('p', commandLine));
+		return arguments;
+	}
+
+	public static String getOption(final char option, final CommandLine commandLine) {
+
+		if (commandLine.hasOption(option)) {
+			return commandLine.getOptionValue(option);
+		}
+
+		return ""; // User StringUtils class EMPTY method.
 	}
 
 	private static void printIssues(String userName, String password, String jiraRestApiUrl)
 			throws IOException, ParseException {
-
-		ProcessBuilder pb = new ProcessBuilder("curl", "--show-error", "--request", "GET", "--header",
-				"Accept: application/json", "--user", userName + ":" + password, jiraRestApiUrl);
-
-		Process p = pb.start();
-
-		InputStream is = p.getInputStream();
-		JSONParser parser = new JSONParser();
-		JSONObject jsonObj = (JSONObject) parser.parse(read(is));
-
+		JSONObject jsonObj = findJiraIssues(userName, password, jiraRestApiUrl);
 		JSONArray jsonArray = (JSONArray) jsonObj.get("issues");
+		String pdfFilename = "sprintIssues.pdf";
+		
 		if (jsonArray != null) {
 			@SuppressWarnings("unchecked")
 			List<Issue> issues = (List<Issue>) jsonArray.stream().map(value_returnIssue).collect(Collectors.toList());
 			// //Print the PDF
-			PDFBuilder.createPDF("sprintIssues.pdf", issues);
+			PDFBuilder.createPDF(pdfFilename, issues);
 		} else {
 			List<Issue> issues = new ArrayList<>();
 			Issue issue = value_returnIssue.apply(jsonObj);
 			issues.add(issue);
 			// //Print the PDF
-			PDFBuilder.createPDF("sprintIssues.pdf", issues);
+			PDFBuilder.createPDF(pdfFilename, issues);
 		}
+	}
+
+	private static JSONObject findJiraIssues(String userName, String password, String jiraRestApiUrl)
+			throws IOException, ParseException {
+		ProcessBuilder pb = new ProcessBuilder("curl", "--show-error", "--request", "GET", "--header",
+				"Accept: application/json", "--user", userName + ":" + password, jiraRestApiUrl);
+		Process p = pb.start();
+
+		InputStream is = p.getInputStream();
+		JSONParser parser = new JSONParser();
+		JSONObject jsonObj = (JSONObject) parser.parse(read(is));
+		return jsonObj;
 	}
 
 	public static String read(InputStream input) throws IOException {
@@ -74,7 +111,7 @@ public class PrintIssue {
 		issue.setKey((String) json.get("key"));
 
 		JSONObject fields = (JSONObject) json.get("fields");
-
+		// System.out.println(fields.toString());
 		issue.setDescription((String) fields.get("description"));
 		issue.setSummary((String) fields.get("summary"));
 		// issue.setIssueType((String) fields.get("issuetype"));
@@ -82,5 +119,4 @@ public class PrintIssue {
 		issue.setStoryPoints((Double) fields.get("customfield_10003"));
 		return issue;
 	};
-
 }
